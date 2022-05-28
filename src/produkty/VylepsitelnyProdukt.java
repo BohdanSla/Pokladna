@@ -17,10 +17,19 @@ public class VylepsitelnyProdukt extends Produkt implements CenaCalculator {
     public void pridejVylepseni(Vylepseni vylepseni) {
         this.vylepseni.add(vylepseni);
     }
+    public ArrayList<Vylepseni> getVylepseni() {
+        return vylepseni;
+    }
 
     @Override
     public int calculateCena() {
-        return 0;
+        int cena = 0;
+        cena = vylepseni
+            .stream()
+            .mapToInt(Vylepseni::getCenaVylepseni)
+            .sum();
+        vylepseni.stream().close();
+        return cena;
     }
 
 }

@@ -1,25 +1,66 @@
 package Kosik;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import CenaCalculator.CenaCalculator;
-import Menu.Menu;
+import Menu.MenuProduktu;
 import produkty.*;
 
 public class Objednavka implements CenaCalculator {
-    ArrayList<Produkt> objednavka = new ArrayList<>();
-    ArrayList<Menu> menuObjednavky = new ArrayList<>();
+    private ArrayList<VylepsitelnyProdukt> produkty = new ArrayList<>();
+    private MenuProduktu menu = new MenuProduktu();
 
-    public void pridejProdukt(Produkt produkt) {
-        objednavka.add(produkt);
+    public void pridejProdukt(VylepsitelnyProdukt p) {
+        produkty.add(p);
     }
-    public void pridejMenu(Menu menu) {
-        menuObjednavky.add(menu);
+    public void odeberProdukt(String nazev) {
+       VylepsitelnyProdukt odebirany = produkty
+            .stream()
+            .filter(produkt -> produkt.getNazevProduktu().compareToIgnoreCase(nazev) == 0)
+            .findFirst()
+            .orElse(null);
+        produkty.stream().close();
+        produkty.remove(odebirany);
+    }
+    public void pridejMenu(MenuProduktu menu) {
+        this.menu = menu;
+    }
+    public void odeberMenu() {
+        this.menu = null;
+    }
+    public ArrayList<VylepsitelnyProdukt> getProdukty() {
+        return produkty;
+    }
+    public VylepsitelnyProdukt getProdukt(int index) {
+        if (index > produkty.size() || index < 0 ) {
+            return null;
+        }
+        return produkty.get(index);
+    }
+    public MenuProduktu getMenu() {
+        return menu;
+    }
+    public void smazatObjednavku() {
+        produkty.removeAll(produkty);
+        odeberMenu();
     }
 
     @Override
     public int calculateCena() {
         // TODO Auto-generated method stub
-        return 0;
+        int cena = 0;
+        cena = produkty
+            .stream()
+            .mapToInt(Produkt::getCenaProduktu)
+            .sum();
+            cena += produkty
+                .stream()
+                .mapToInt(e -> e.calculateCena())
+                .sum();
+            produkty.stream().close();
+        if (menu == null) {
+            return cena;
+        }
+        return cena + menu.calculateCena();
     }
 }

@@ -2,37 +2,57 @@ package Kosik;
 
 import java.util.ArrayList;
 
-import CenaCalculator.CenaCalculator;
+import Menu.MenuProduktu;
+import produkty.VylepsitelnyProdukt;
 
-public class Kosik implements CenaCalculator {
+public class Kosik  {
     private ArrayList<Objednavka> kosik = new ArrayList<>();
-    private int prepisovani = 0;
+    private int indexPrepisovani = 0;
+    private static Kosik instance;
 
-    public void pridejObjednavku(Objednavka objednavka) {
-        if (prepisovani < 10) {
-            kosik.set(prepisovani,objednavka);
-            prepisovani++;
-        } else {
-            prepisovani = 0;
-            kosik.set(prepisovani,objednavka);
+    private Kosik() {
+        for (int i = 0; i < 10; i++) {
+            kosik.add(new Objednavka());
         }
     }
-    public void odeberObjednavku(int cisloObjednavky) {
-        if(cisloObjednavky < kosik.size() && cisloObjednavky != -1)
-            kosik.remove(cisloObjednavky);
+
+    public static Kosik getKosik() {
+        if (instance == null) {
+            instance = new Kosik();
+        }
+        return instance;
+    }
+    //                          u noveMenu se nevytvoří nová reference
+    public void pridejObjednavku(MenuProduktu noveMenu, ArrayList<VylepsitelnyProdukt> produkty) {
+        Objednavka objednavka = new Objednavka(); // při vytvoření novýho objektu se vytvoří nová reference (nové místo v paměti)
+        if (noveMenu != null) {
+            MenuProduktu menu = new MenuProduktu();
+            for ( VylepsitelnyProdukt produkt : noveMenu.getProdukty()) {
+                menu.pridejProdukt(produkt);
+            }
+            objednavka.pridejMenu(menu);
+        }
+        for (VylepsitelnyProdukt produkt : produkty) {
+            objednavka.pridejProdukt(produkt);
+        }
+        if (indexPrepisovani < 10) {
+            kosik.set(indexPrepisovani,objednavka);
+            indexPrepisovani++;
+        } else {
+            indexPrepisovani = 0;
+            kosik.set(indexPrepisovani,objednavka);
+        }
     }
     public Objednavka ukazObjednavku(int cisloObjednavky) {
-        if(cisloObjednavky < kosik.size() && cisloObjednavky != -1)
-            return kosik.get(cisloObjednavky);
-        else 
+        if(cisloObjednavky == -1) {
             return null;
+        }
+        if(kosik.get(cisloObjednavky).getMenu().getProdukty().size() == 0 && kosik.get(cisloObjednavky).getProdukty().size() == 0) {
+            return null;
+        }
+        return kosik.get(cisloObjednavky);
     }
     public int getVelikostKosiku() {
         return kosik.size();
-    }
-    @Override
-    public int calculateCena() {
-        // TODO Auto-generated method stub
-        return 0;
     }
 }
